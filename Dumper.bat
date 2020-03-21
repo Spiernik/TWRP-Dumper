@@ -59,6 +59,10 @@ ECHO. >> .\%id%\%id%_info.txt
 ECHO Security-Patch: >> .\%id%\%id%_info.txt
 findstr version.security_patch .\%id%\prop.csv >> .\%id%\%id%_info.txt
 
+ECHO Seriennummer erfasst
+ECHO. >> .\%id%\%id%_info.txt
+ECHO Seriennummer: >> .\%id%\%id%_info.txt
+.\ressources\adb.exe get-serialno >> .\%id%\%id%_info.txt
 
 del /f .\%id%\prop.csv
 
