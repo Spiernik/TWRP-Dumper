@@ -111,4 +111,7 @@ ECHO.
 .\ressources\adb.exe pull /dev/block/sdd .\%id%\%id%_sdd.stepan
 .\ressources\adb.exe pull /dev/block/sde .\%id%\%id%_sde.stepan
 .\ressources\adb.exe pull /dev/block/sdf .\%id%\%id%_sdf.stepan
+
+::Kille ADB Server
+.\ressources\adb.exe kill-server
 pause
