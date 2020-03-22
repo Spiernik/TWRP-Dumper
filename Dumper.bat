@@ -114,4 +114,12 @@ ECHO.
 
 ::Kille ADB Server
 .\ressources\adb.exe kill-server
+
+::Berechne Hashwerte
+ECHO MD5: >> .\%id%\%id%_info.txt
+CertUtil -hashfile .\%id%\%id%_mmcblk0.stepan MD5 | find /i /v "md5" | find /i /v "certutil"
+
+ECHO SHA256: >> .\%id%\%id%_info.txt
+CertUtil -hashfile .\%id%\%id%_mmcblk0.stepan SHA256 | find /i /v "sha256" | find /i /v "certutil"
+
 pause
