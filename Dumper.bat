@@ -30,12 +30,21 @@ del /f .\temp
 ECHO.
 
 ::Name eingeben
+:: ToDo: Abfragen ob Ordner bereits existiert
 ECHO [1;4mBitte Sicherungsname eingeben.[0m
 ECHO.
 set /P id=Sicherungsname:
 mkdir %id%
 ECHO.
 
+::Abfrage ob Metadaten erfasst werden sollen
+set /P askMeta="Metadaten erfassen? (y/n) "
+ECHO.
+IF %askMeta% == y GOTO META
+	IF %askMeta% == z GOTO META
+	GOTO DUMP
+
+:META
 ::Erfasse Metadaten
 .\ressources\adb.exe shell getprop > .\%id%\prop.csv
 
@@ -101,6 +110,7 @@ ECHO.
 ::Lösche die Temp Datei
 del /f .\%id%\prop.csv
 
+:DUMP
 ECHO [101;93mSichere Geraetespeicher[0m
 ECHO.
 ::Versuche die verschiedenen Speicher zu kopieren. ToDo: Try/Catch einfügen
