@@ -30,11 +30,21 @@ del /f .\temp
 ECHO.
 
 ::Name eingeben
-:: ToDo: Abfragen ob Ordner bereits existiert
 ECHO [1;4mBitte Sicherungsname eingeben.[0m
 ECHO.
 set /P id=Sicherungsname:
-mkdir %id%
+
+::Datum erfassen
+set d=%date%
+set SORTDATE=%d:~-4%-%d:~3,2%-%d:~0,2%
+
+::Zeit Erfassen
+set t=%time%
+set SORTTIME=%t:~0,2%%t:~3,2%%t:~6,2%
+if "%SORTTIME:~0,1%"==" " set SORTTIME=0%SORTTIME:~1,6%
+
+set idDir=%id%-%SORTDATE%-%SORTTIME%
+MKDIR %idDir%
 ECHO.
 
 ::Abfrage ob Metadaten erfasst werden sollen
@@ -46,90 +56,90 @@ IF %askMeta% == y GOTO META
 
 :META
 ::Erfasse Metadaten
-.\ressources\adb.exe shell getprop > .\%id%\prop.csv
+.\ressources\adb.exe shell getprop > .\%idDir%\prop.csv
 
 ECHO [1;4mErfasse Metadaten zur Sicherung[0m
 
 ECHO [36mADB-Geraet erfasst[0m
-ECHO ADB-Device: > .\%id%\%id%_info.txt
-.\ressources\adb.exe devices -l >> .\%id%\%id%_info.txt
+ECHO ADB-Device: > .\%idDir%\%id%_info.txt
+.\ressources\adb.exe devices -l >> .\%idDir%\%id%_info.txt
 
 ECHO [36mZeitpunkt der Sicherung erfasst[0m
-ECHO Zeitpunkt der Sicherung: > .\%id%\%id%_info.txt
-time /t >> .\%id%\%id%_info.txt
-date /t >> .\%id%\%id%_info.txt
+ECHO Zeitpunkt der Sicherung: > .\%idDir%\%id%_info.txt
+ECHO %time% >> .\%idDir%\%id%_info.txt
+ECHO %date% >> .\%idDir%\%id%_info.txt
 
 ECHO [36mZeit Geraet erfasst[0m
-ECHO. >> .\%id%\%id%_info.txt
-ECHO Shell-Zeitstempel: >> .\%id%\%id%_info.txt
-.\ressources\adb.exe shell date >> .\%id%\%id%_info.txt
+ECHO. >> .\%idDir%\%id%_info.txt
+ECHO Shell-Zeitstempel: >> .\%idDir%\%id%_info.txt
+.\ressources\adb.exe shell date >> .\%idDir%\%id%_info.txt
 
 ECHO [36mHersteller Geraet erfasst[0m
-ECHO. >> .\%id%\%id%_info.txt
-ECHO Hersteller: >> .\%id%\%id%_info.txt
-findstr brand .\%id%\prop.csv >> .\%id%\%id%_info.txt
-findstr brand .\%id%\prop.csv >> .\%id%\%id%_info.txt
+ECHO. >> .\%idDir%\%id%_info.txt
+ECHO Hersteller: >> .\%idDir%\%id%_info.txt
+findstr brand .\%idDir%\prop.csv >> .\%idDir%\%id%_info.txt
+findstr brand .\%idDir%\prop.csv >> .\%idDir%\%id%_info.txt
 
 ECHO [36mModellbezeichnung erfasst[0m
-ECHO. >> .\%id%\%id%_info.txt
-ECHO Modell: >> .\%id%\%id%_info.txt
-findstr product.manufacturer .\%id%\prop.csv >> .\%id%\%id%_info.txt
-findstr product.name .\%id%\prop.csv >> .\%id%\%id%_info.txt
-findstr product.model .\%id%\prop.csv >> .\%id%\%id%_info.txt
+ECHO. >> .\%idDir%\%id%_info.txt
+ECHO Modell: >> .\%idDir%\%id%_info.txt
+findstr product.manufacturer .\%idDir%\prop.csv >> .\%idDir%\%id%_info.txt
+findstr product.name .\%idDir%\prop.csv >> .\%idDir%\%id%_info.txt
+findstr product.model .\%idDir%\prop.csv >> .\%idDir%\%id%_info.txt
 
 ECHO [36mIMEI erfasst[0m
-ECHO. >> .\%id%\%id%_info.txt
-ECHO IMEI: >> .\%id%\%id%_info.txt
-findstr imei .\%id%\prop.csv >> .\%id%\%id%_info.txt
-.\ressources\adb.exe shell service call iphonesubinfo 1 >> .\%id%\%id%_info.txt
-.\ressources\adb.exe shell service call iphonesubinfo 3 >> .\%id%\%id%_info.txt
+ECHO. >> .\%idDir%\%id%_info.txt
+ECHO IMEI: >> .\%idDir%\%id%_info.txt
+findstr imei .\%idDir%\prop.csv >> .\%idDir%\%id%_info.txt
+.\ressources\adb.exe shell service call iphonesubinfo 1 >> .\%idDir%\%id%_info.txt
+.\ressources\adb.exe shell service call iphonesubinfo 3 >> .\%idDir%\%id%_info.txt
 
-ECHO [36mAndroid-Version erfasst[0m
-ECHO. >> .\%id%\%id%_info.txt
-ECHO Android-Version: >> .\%id%\%id%_info.txt
-findstr build.version.release .\%id%\prop.csv >> .\%id%\%id%_info.txt
+ECHO [36mAndroidDir-Version erfasst[0m
+ECHO. >> .\%idDir%\%id%_info.txt
+ECHO AndroidDir-Version: >> .\%idDir%\%id%_info.txt
+findstr build.version.release .\%idDir%\prop.csv >> .\%idDir%\%id%_info.txt
 
 ECHO [36mSecurity-Patch erfasst[0m
-ECHO. >> .\%id%\%id%_info.txt
-ECHO Security-Patch: >> .\%id%\%id%_info.txt
-findstr version.security_patch .\%id%\prop.csv >> .\%id%\%id%_info.txt
+ECHO. >> .\%idDir%\%id%_info.txt
+ECHO Security-Patch: >> .\%idDir%\%id%_info.txt
+findstr version.security_patch .\%idDir%\prop.csv >> .\%idDir%\%id%_info.txt
 
 ECHO [36mSeriennummer erfasst[0m
-ECHO. >> .\%id%\%id%_info.txt
-ECHO Seriennummer: >> .\%id%\%id%_info.txt
-.\ressources\adb.exe get-serialno >> .\%id%\%id%_info.txt
+ECHO. >> .\%idDir%\%id%_info.txt
+ECHO Seriennummer: >> .\%idDir%\%id%_info.txt
+.\ressources\adb.exe get-serialno >> .\%idDir%\%id%_info.txt
 
 ECHO [36mFilesystem erfasst[0m
-ECHO. >> .\%id%\%id%_info.txt
-ECHO Filesystem: >> .\%id%\%id%_info.txt
-.\ressources\adb.exe shell df >> .\%id%\%id%_info.txt
+ECHO. >> .\%idDir%\%id%_info.txt
+ECHO Filesystem: >> .\%idDir%\%id%_info.txt
+.\ressources\adb.exe shell df >> .\%idDir%\%id%_info.txt
 ECHO.
 ECHO.
 
 
 ::Lösche die Temp Datei
-del /f .\%id%\prop.csv
+del /f .\%idDir%\prop.csv
 
 :DUMP
 ECHO [101;93mSichere Geraetespeicher[0m
 ECHO.
 ::Versuche die verschiedenen Speicher zu kopieren. ToDo: Try/Catch einfügen
-.\ressources\adb.exe pull /dev/block/mmcblk0 .\%id%\%id%_mmcblk0.stepan
-.\ressources\adb.exe pull /dev/block/sda .\%id%\%id%_sda.stepan
-.\ressources\adb.exe pull /dev/block/sdb .\%id%\%id%_sdb.stepan
-.\ressources\adb.exe pull /dev/block/sdc .\%id%\%id%_sdc.stepan
-.\ressources\adb.exe pull /dev/block/sdd .\%id%\%id%_sdd.stepan
-.\ressources\adb.exe pull /dev/block/sde .\%id%\%id%_sde.stepan
-.\ressources\adb.exe pull /dev/block/sdf .\%id%\%id%_sdf.stepan
+.\ressources\adb.exe pull /dev/block/mmcblk0 .\%idDir%\%id%_mmcblk0.stepan
+.\ressources\adb.exe pull /dev/block/sda .\%idDir%\%id%_sda.stepan
+.\ressources\adb.exe pull /dev/block/sdb .\%idDir%\%id%_sdb.stepan
+.\ressources\adb.exe pull /dev/block/sdc .\%idDir%\%id%_sdc.stepan
+.\ressources\adb.exe pull /dev/block/sdd .\%idDir%\%id%_sdd.stepan
+.\ressources\adb.exe pull /dev/block/sde .\%idDir%\%id%_sde.stepan
+.\ressources\adb.exe pull /dev/block/sdf .\%idDir%\%id%_sdf.stepan
 
 ::Kille ADB Server
 .\ressources\adb.exe kill-server
 
 ::Berechne Hashwerte
 ECHO MD5: >> .\%id%\%id%_info.txt
-CertUtil -hashfile .\%id%\%id%_mmcblk0.stepan MD5 | find /i /v "md5" | find /i /v "certutil"
+CertUtil -hashfile .\%idDir%\%id%_mmcblk0.stepan MD5 | find /i /v "md5" | find /i /v "certutil"
 
 ECHO SHA256: >> .\%id%\%id%_info.txt
-CertUtil -hashfile .\%id%\%id%_mmcblk0.stepan SHA256 | find /i /v "sha256" | find /i /v "certutil"
+CertUtil -hashfile .\%idDir%\%id%_mmcblk0.stepan SHA256 | find /i /v "sha256" | find /i /v "certutil"
 
 pause
