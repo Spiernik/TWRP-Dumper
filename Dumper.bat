@@ -43,6 +43,7 @@ set t=%time%
 set SORTTIME=%t:~0,2%%t:~3,2%%t:~6,2%
 if "%SORTTIME:~0,1%"==" " set SORTTIME=0%SORTTIME:~1,6%
 
+::Erstelle den Ordner
 set idDir=%id%-%SORTDATE%-%SORTTIME%
 MKDIR %idDir%
 ECHO.
@@ -116,30 +117,53 @@ ECHO Filesystem: >> .\%idDir%\%id%_info.txt
 ECHO.
 ECHO.
 
-
 ::Lösche die Temp Datei
 del /f .\%idDir%\prop.csv
 
 :DUMP
 ECHO [101;93mSichere Geraetespeicher[0m
 ECHO.
-::Versuche die verschiedenen Speicher zu kopieren. ToDo: Try/Catch einfügen
-.\ressources\adb.exe pull /dev/block/mmcblk0 .\%idDir%\%id%_mmcblk0.stepan
-.\ressources\adb.exe pull /dev/block/sda .\%idDir%\%id%_sda.stepan
+::Versuche die verschiedenen Speicher zu kopieren.
+.\ressources\adb.exe pull /dev/block/mmcblk0 .\%idDir%\%id%_mmcblk0.stepan 2>NUL
+IF %ERRORLEVEL% NEQ 0 (
+	ECHO mmcblk nicht gefunden. Probiere stattdessen SDA
+	ECHO.
+	goto SDA
+) ELSE (
+	ECHO mmcblk erfolgreich kopiert
+	ECHO.
+	goto HashMmc
+)
+
+:HashMmc
+::Berechne Hashwerte
+ECHO Hashwert wird berechnet
+ECHO MD5: >> .\%idDir%\%id%_info.txt
+CertUtil -hashfile .\%idDir%\%id%_mmcblk0.stepan MD5 | find /i /v "md5" | find /i /v "certutil" >> .\%idDir%\%id%_info.txt
+ECHO SHA256: >> .\%idDir%\%id%_info.txt
+CertUtil -hashfile .\%idDir%\%id%_mmcblk0.stepan SHA256 | find /i /v "sha256" | find /i /v "certutil" >> .\%idDir%\%id%_info.txt
+ECHO Hashwert erfolgreich berechnet
+GOTO END
+
+:SDA
+.\ressources\adb.exe pull /dev/block/sdc .\%idDir%\%id%_sda.stepan
+ECHO Hashwert wird berechnet
+ECHO MD5: >> .\%idDir%\%id%_info.txt
+CertUtil -hashfile .\%idDir%\%id%_sda.stepan MD5 | find /i /v "md5" | find /i /v "certutil" >> .\%idDir%\%id%_info.txt
+ECHO SHA256: >> .\%idDir%\%id%_info.txt
+CertUtil -hashfile .\%idDir%\%id%_sda.stepan SHA256 | find /i /v "sha256" | find /i /v "certutil" >> .\%idDir%\%id%_info.txt
+ECHO Hashwert erfolgreich berechnet
+ECHO.
+ECHO Kopiere sonstige Partitionen
 .\ressources\adb.exe pull /dev/block/sdb .\%idDir%\%id%_sdb.stepan
 .\ressources\adb.exe pull /dev/block/sdc .\%idDir%\%id%_sdc.stepan
 .\ressources\adb.exe pull /dev/block/sdd .\%idDir%\%id%_sdd.stepan
 .\ressources\adb.exe pull /dev/block/sde .\%idDir%\%id%_sde.stepan
 .\ressources\adb.exe pull /dev/block/sdf .\%idDir%\%id%_sdf.stepan
+ECHO Interner Speicher erfolgreich kopiert
 
+:END
 ::Kille ADB Server
 .\ressources\adb.exe kill-server
-
-::Berechne Hashwerte
-ECHO MD5: >> .\%id%\%id%_info.txt
-CertUtil -hashfile .\%idDir%\%id%_mmcblk0.stepan MD5 | find /i /v "md5" | find /i /v "certutil"
-
-ECHO SHA256: >> .\%id%\%id%_info.txt
-CertUtil -hashfile .\%idDir%\%id%_mmcblk0.stepan SHA256 | find /i /v "sha256" | find /i /v "certutil"
-
-pause
+ECHO TWRP-Dumper abgeschlossen.
+pause >NUL
