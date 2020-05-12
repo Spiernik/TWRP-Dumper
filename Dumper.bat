@@ -43,9 +43,14 @@ set t=%time%
 set SORTTIME=%t:~0,2%%t:~3,2%%t:~6,2%
 if "%SORTTIME:~0,1%"==" " set SORTTIME=0%SORTTIME:~1,6%
 
+::Abfrage ob Komprimiert werden sollen
+set /P askCompress="Sicherung komprimieren(.e01)? (y/n) "
+ECHO.
+
 ::Erstelle den Ordner
 set idDir=%id%-%SORTDATE%-%SORTTIME%
 MKDIR %idDir%
+IF %askCompress% == y MKDIR %idDir%\compressed
 ECHO.
 
 ::Abfrage ob Metadaten erfasst werden sollen
@@ -53,8 +58,8 @@ set /P askMeta="Metadaten erfassen? (y/n) "
 ECHO.
 IF %askMeta% == y GOTO META
 	IF %askMeta% == z GOTO META
-	GOTO DUMP
-
+	GOTO DUMP	
+	
 :META
 ::Erfasse Metadaten
 .\ressources\adb.exe shell getprop > .\%idDir%\prop.csv
@@ -126,12 +131,15 @@ ECHO.
 ::Versuche die verschiedenen Speicher zu kopieren.
 .\ressources\adb.exe pull /dev/block/mmcblk0 .\%idDir%\%id%_mmcblk0.stepan 2>NUL
 IF %ERRORLEVEL% NEQ 0 (
-	ECHO mmcblk nicht gefunden. Probiere stattdessen SDA
+	ECHO.
+	ECHO mmcblk nicht gefunden. 
+	ECHO Probiere stattdessen SDA.
 	ECHO.
 	goto SDA
 ) ELSE (
 	ECHO mmcblk erfolgreich kopiert
 	ECHO.
+	IF %askCompress% == y .\ressources\ftkimager\ftkimager.exe .\%idDir%\%id%_mmcblk0.stepan .\%idDir%\compressed\%id%_mmcblk0 --e01 --compress 9	
 	goto HashMmc
 )
 
@@ -146,7 +154,8 @@ ECHO Hashwert erfolgreich berechnet
 GOTO END
 
 :SDA
-.\ressources\adb.exe pull /dev/block/sda .\%idDir%\%id%_sda.stepan
+.\ressources\adb.exe pull /dev/block/sdc .\%idDir%\%id%_sda.stepan
+IF %askCompress% == y .\ressources\ftkimager\ftkimager.exe .\%idDir%\%id%_sda.stepan .\%idDir%\compressed\%id%_sda --e01 --compress 9
 ECHO Hashwert wird berechnet
 ECHO MD5: >> .\%idDir%\%id%_info.txt
 CertUtil -hashfile .\%idDir%\%id%_sda.stepan MD5 | find /i /v "md5" | find /i /v "certutil" >> .\%idDir%\%id%_info.txt
@@ -156,10 +165,15 @@ ECHO Hashwert erfolgreich berechnet
 ECHO.
 ECHO Kopiere sonstige Partitionen
 .\ressources\adb.exe pull /dev/block/sdb .\%idDir%\%id%_sdb.stepan
+IF %askCompress% == y .\ressources\ftkimager\ftkimager.exe .\%idDir%\%id%_sdb.stepan .\%idDir%\compressed\%id%_sdb --e01 --compress 9
 .\ressources\adb.exe pull /dev/block/sdc .\%idDir%\%id%_sdc.stepan
+IF %askCompress% == y .\ressources\ftkimager\ftkimager.exe .\%idDir%\%id%_sdc.stepan .\%idDir%\compressed\%id%_sdc --e01 --compress 9
 .\ressources\adb.exe pull /dev/block/sdd .\%idDir%\%id%_sdd.stepan
+IF %askCompress% == y .\ressources\ftkimager\ftkimager.exe .\%idDir%\%id%_sdd.stepan .\%idDir%\compressed\%id%_sdd --e01 --compress 9
 .\ressources\adb.exe pull /dev/block/sde .\%idDir%\%id%_sde.stepan
+IF %askCompress% == y .\ressources\ftkimager\ftkimager.exe .\%idDir%\%id%_sde.stepan .\%idDir%\compressed\%id%_sde --e01 --compress 9
 .\ressources\adb.exe pull /dev/block/sdf .\%idDir%\%id%_sdf.stepan
+IF %askCompress% == y .\ressources\ftkimager\ftkimager.exe .\%idDir%\%id%_sdf.stepan .\%idDir%\compressed\%id%_sdf --e01 --compress 9
 ECHO Interner Speicher erfolgreich kopiert
 
 :END
