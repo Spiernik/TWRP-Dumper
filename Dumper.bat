@@ -154,7 +154,7 @@ ECHO Hashwert erfolgreich berechnet
 GOTO END
 
 :SDA
-.\ressources\adb.exe pull /dev/block/sdc .\%idDir%\%id%_sda.stepan
+.\ressources\adb.exe pull /dev/block/sda .\%idDir%\%id%_sda.stepan
 IF %askCompress% == y .\ressources\ftkimager\ftkimager.exe .\%idDir%\%id%_sda.stepan .\%idDir%\compressed\%id%_sda --e01 --compress 9
 ECHO Hashwert wird berechnet
 ECHO MD5: >> .\%idDir%\%id%_info.txt
