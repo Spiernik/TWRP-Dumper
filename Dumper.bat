@@ -146,7 +146,7 @@ ECHO Hashwert erfolgreich berechnet
 GOTO END
 
 :SDA
-.\ressources\adb.exe pull /dev/block/sdc .\%idDir%\%id%_sda.stepan
+.\ressources\adb.exe pull /dev/block/sda .\%idDir%\%id%_sda.stepan
 ECHO Hashwert wird berechnet
 ECHO MD5: >> .\%idDir%\%id%_info.txt
 CertUtil -hashfile .\%idDir%\%id%_sda.stepan MD5 | find /i /v "md5" | find /i /v "certutil" >> .\%idDir%\%id%_info.txt
