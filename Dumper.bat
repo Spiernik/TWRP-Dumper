@@ -47,6 +47,10 @@ if "%SORTTIME:~0,1%"==" " set SORTTIME=0%SORTTIME:~1,6%
 set /P askCompress="Sicherung komprimieren(.e01)? (y/n) "
 ECHO.
 
+::Abfrage ob Hash berechnet werden sollen
+set /P askHash="Sicherung hashen?(SHA256 und md5; VORSICHT dauert lange!)? (y/n) "
+ECHO.
+
 ::Erstelle den Ordner
 set idDir=%id%-%SORTDATE%-%SORTTIME%
 MKDIR %idDir%
@@ -129,7 +133,7 @@ del /f .\%idDir%\prop.csv
 ECHO [101;93mSichere Geraetespeicher[0m
 ECHO.
 ::Versuche die verschiedenen Speicher zu kopieren.
-.\ressources\adb.exe pull /dev/block/mmcblk0 .\%idDir%\%id%_mmcblk0.stepan 2>NUL
+.\ressources\adb.exe pull /dev/block/mmcblk0p29 .\%idDir%\%id%_mmcblk0.stepan 2>NUL
 IF %ERRORLEVEL% NEQ 0 (
 	ECHO.
 	ECHO mmcblk nicht gefunden. 
@@ -140,7 +144,8 @@ IF %ERRORLEVEL% NEQ 0 (
 	ECHO mmcblk erfolgreich kopiert
 	ECHO.
 	IF %askCompress% == y .\ressources\ftkimager\ftkimager.exe .\%idDir%\%id%_mmcblk0.stepan .\%idDir%\compressed\%id%_mmcblk0 --e01 --compress 9	
-	goto HashMmc
+	IF %askHash% == y goto HashMmc	
+	GOTO END
 )
 
 :HashMmc
@@ -148,20 +153,28 @@ IF %ERRORLEVEL% NEQ 0 (
 ECHO Hashwert wird berechnet
 ECHO MD5: >> .\%idDir%\%id%_info.txt
 CertUtil -hashfile .\%idDir%\%id%_mmcblk0.stepan MD5 | find /i /v "md5" | find /i /v "certutil" >> .\%idDir%\%id%_info.txt
+ECHO MD5 berechnet
 ECHO SHA256: >> .\%idDir%\%id%_info.txt
 CertUtil -hashfile .\%idDir%\%id%_mmcblk0.stepan SHA256 | find /i /v "sha256" | find /i /v "certutil" >> .\%idDir%\%id%_info.txt
+ECHO SHA256 berechnet
+ECHO Hashwert erfolgreich berechnet
+GOTO END
+
+:HashSDA
+::Berechne Hashwerte
+ECHO Hashwert wird berechnet
+ECHO MD5: >> .\%idDir%\%id%_info.txt
+CertUtil -hashfile .\%idDir%\%id%_sda.stepan MD5 | find /i /v "md5" | find /i /v "certutil" >> .\%idDir%\%id%_info.txt
+ECHO MD5 berechnet
+ECHO SHA256: >> .\%idDir%\%id%_info.txt
+CertUtil -hashfile .\%idDir%\%id%_sda.stepan SHA256 | find /i /v "sha256" | find /i /v "certutil" >> .\%idDir%\%id%_info.txt
+ECHO SHA256 berechnet
 ECHO Hashwert erfolgreich berechnet
 GOTO END
 
 :SDA
 .\ressources\adb.exe pull /dev/block/sda .\%idDir%\%id%_sda.stepan
 IF %askCompress% == y .\ressources\ftkimager\ftkimager.exe .\%idDir%\%id%_sda.stepan .\%idDir%\compressed\%id%_sda --e01 --compress 9
-ECHO Hashwert wird berechnet
-ECHO MD5: >> .\%idDir%\%id%_info.txt
-CertUtil -hashfile .\%idDir%\%id%_sda.stepan MD5 | find /i /v "md5" | find /i /v "certutil" >> .\%idDir%\%id%_info.txt
-ECHO SHA256: >> .\%idDir%\%id%_info.txt
-CertUtil -hashfile .\%idDir%\%id%_sda.stepan SHA256 | find /i /v "sha256" | find /i /v "certutil" >> .\%idDir%\%id%_info.txt
-ECHO Hashwert erfolgreich berechnet
 ECHO.
 ECHO Kopiere sonstige Partitionen
 .\ressources\adb.exe pull /dev/block/sdb .\%idDir%\%id%_sdb.stepan
@@ -175,6 +188,7 @@ IF %askCompress% == y .\ressources\ftkimager\ftkimager.exe .\%idDir%\%id%_sde.st
 .\ressources\adb.exe pull /dev/block/sdf .\%idDir%\%id%_sdf.stepan
 IF %askCompress% == y .\ressources\ftkimager\ftkimager.exe .\%idDir%\%id%_sdf.stepan .\%idDir%\compressed\%id%_sdf --e01 --compress 9
 ECHO Interner Speicher erfolgreich kopiert
+IF %askHash% == y goto HashSDA
 
 :END
 ::Kille ADB Server
