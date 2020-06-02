@@ -133,7 +133,7 @@ del /f .\%idDir%\prop.csv
 ECHO [101;93mSichere Geraetespeicher[0m
 ECHO.
 ::Versuche die verschiedenen Speicher zu kopieren.
-.\ressources\adb.exe pull /dev/block/mmcblk0p29 .\%idDir%\%id%_mmcblk0.stepan 2>NUL
+.\ressources\adb.exe pull /dev/block/mmcblk0 .\%idDir%\%id%_mmcblk0.stepan 2>NUL
 IF %ERRORLEVEL% NEQ 0 (
 	ECHO.
 	ECHO mmcblk nicht gefunden. 
