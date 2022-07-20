@@ -1,7 +1,8 @@
 @echo off
 cls
-ECHO ADB Dumper 0.0.1 
-ECHO Copyright by Stepan
+ECHO ADB Dumper 0.0.1.1
+ECHO Copyright, Copyleft and Copymiddle by Stepan
+::Nächste Version auch Copyup und Copydown unterstützen
 
 echo [101;93m
 :: Displays Ascii art
@@ -137,9 +138,9 @@ ECHO.
 IF %ERRORLEVEL% NEQ 0 (
 	ECHO.
 	ECHO mmcblk nicht gefunden. 
-	ECHO Probiere stattdessen SDA.
+	ECHO Probiere stattdessen nandX.
 	ECHO.
-	goto SDA
+	goto NANDX
 ) ELSE (
 	ECHO mmcblk erfolgreich kopiert
 	ECHO.
@@ -190,8 +191,45 @@ IF %askCompress% == y .\ressources\ftkimager\ftkimager.exe .\%idDir%\%id%_sdf.st
 ECHO Interner Speicher erfolgreich kopiert
 IF %askHash% == y goto HashSDA
 
+:NANDX
+.\ressources\adb.exe pull /dev/block/nanda .\%idDir%\%id%_nanda.stepan
+IF %ERRORLEVEL% NEQ 0 (
+	ECHO.
+	ECHO nandX nicht gefunden. 
+	ECHO Probiere stattdessen SDA.
+	ECHO.
+	goto SDA
+) ELSE (
+	ECHO nanda gesichert.
+	.\ressources\adb.exe pull /dev/block/nandb .\%idDir%\%id%_nandb.stepan
+	ECHO nandb gesichert.
+	.\ressources\adb.exe pull /dev/block/nandc .\%idDir%\%id%_nandc.stepan
+	ECHO nandc gesichert.
+	.\ressources\adb.exe pull /dev/block/nandd .\%idDir%\%id%_nandd.stepan
+	ECHO nandd gesichert.
+	.\ressources\adb.exe pull /dev/block/nande .\%idDir%\%id%_nande.stepan
+	ECHO nande gesichert.
+	.\ressources\adb.exe pull /dev/block/nandf .\%idDir%\%id%_nandf.stepan
+	ECHO nandf gesichert.
+	.\ressources\adb.exe pull /dev/block/nandg .\%idDir%\%id%_nandg.stepan
+	ECHO nandg gesichert.
+	.\ressources\adb.exe pull /dev/block/nandh .\%idDir%\%id%_nandh.stepan
+	ECHO nandh gesichert.
+	.\ressources\adb.exe pull /dev/block/nandi .\%idDir%\%id%_nandi.stepan
+	ECHO nandi gesichert.
+	.\ressources\adb.exe pull /dev/block/nandj .\%idDir%\%id%_nandj.stepan
+	ECHO nandj gesichert.
+	.\ressources\adb.exe pull /dev/block/nandk .\%idDir%\%id%_nandk.stepan
+	ECHO nandk gesichert.
+	
+	ECHO nandX erfolgreich ausgefuehrt
+	ECHO.	
+	GOTO END
+)
+
 :END
 ::Kille ADB Server
 .\ressources\adb.exe kill-server
+ECHO.
 ECHO TWRP-Dumper abgeschlossen.
 pause >NUL
