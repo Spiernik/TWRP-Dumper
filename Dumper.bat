@@ -4,7 +4,7 @@ setlocal EnableDelayedExpansion
 (set \n=^
 %=empty line=%
 )
-ECHO ADB Dumper 0.0.1.2
+ECHO ADB Dumper 0.0.1.3
 ECHO Copyright, Copyleft and Copymiddle by Stepan
 ::Nächste Version auch Copyup und Copydown unterstützen
 
