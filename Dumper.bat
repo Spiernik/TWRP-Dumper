@@ -13,6 +13,7 @@ echo [101;93m
 type .\ressources\art
 echo [0m
 
+:START
 ::Starte den ADB Server
 ECHO [1;4mStarte ADB-Server[0m
 ECHO.
@@ -22,10 +23,20 @@ ECHO.
 .\ressources\adb.exe start-server
 ECHO.
 
-::ADB Geräte ausgeben
+::Kontrollieren ob Gerät in recovery-modus über adb erkannt wurde
 ECHO [1;4mADB-Geraete:[0m
 ECHO.
-.\ressources\adb.exe devices -l
+.\ressources\adb.exe devices | find "recovery" >nul
+if errorlevel 1 (
+	ECHO [91mKein Geraet im Recovery-Modus gefunden.[0m
+	ECHO Warte 5 Sekunden und starte dann neu.
+	@ping -n 5 localhost> nul
+	GOTO START
+) else (
+	ECHO [92mGeraet im Recovery-Modus gefunden.[0m
+	ECHO.
+	.\ressources\adb.exe devices -l
+)
 
 ECHO Modellbezeichnung:
 .\ressources\adb.exe shell getprop > .\temp
