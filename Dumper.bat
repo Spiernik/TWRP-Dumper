@@ -189,33 +189,33 @@ IF %ERRORLEVEL% NEQ 0 (
 
 :HashMmc
 ::Berechne Hashwerte für mmcblk
-ECHO Hashwert wird berechnet
+ECHO [101;93mHashwert wird berechnet[0m
 ECHO MD5: >> .\%idDir%\%id%_info.txt
-set tmp=CertUtil -hashfile .\%idDir%\%id%_mmcblk0.stepan MD5 | find /i /v "md5" | find /i /v "certutil"
-%tmp% >> .\%idDir%\%id%_info.txt
-set Hash=%Hash%!\n!%tmp%
-ECHO MD5=%tmp%
+for /f "delims=" %%A in ('certutil -hashfile .\%idDir%\%id%_mmcblk0.stepan MD5 ^| find /v ":"') do set "hashValue=%%A"
+ECHO !hashValue! >> .\%idDir%\%id%_info.txt
+set Hash=%Hash%!\n!%hashValue%
+ECHO MD5=%hashValue%
 ECHO SHA256: >> .\%idDir%\%id%_info.txt
-set tmp=CertUtil -hashfile .\%idDir%\%id%_mmcblk0.stepan SHA256 | find /i /v "sha256" | find /i /v "certutil"
-%tmp% >> .\%idDir%\%id%_info.txt
-set SHA256=%SHA256%!\n!%tmp%
-ECHO SHA256=%tmp%
+for /f "delims=" %%A in ('certutil -hashfile .\%idDir%\%id%_mmcblk0.stepan SHA256 ^| find /v ":"') do set "hashValue=%%A"
+ECHO !hashValue! >> .\%idDir%\%id%_info.txt
+set SHA256=%SHA256%!\n!%hashValue%
+ECHO SHA256=%hashValue%
 ECHO Hashwert erfolgreich berechnet
 GOTO END
 
 :HashSDA
 ::Berechne Hashwerte für SDA
-ECHO Hashwert wird berechnet
+ECHO [101;93mHashwert wird berechnet[0m
 ECHO MD5: >> .\%idDir%\%id%_info.txt
-set tmp=CertUtil -hashfile .\%idDir%\%id%_sda.stepan MD5 | find /i /v "md5" | find /i /v "certutil"
-%tmp% >> .\%idDir%\%id%_info.txt
-set Hash=%Hash%!\n!%tmp%
-ECHO MD5=%tmp%
+for /f "delims=" %%A in ('certutil -hashfile .\%idDir%\%id%_sda.stepan MD5 ^| find /v ":"') do set "hashValue=%%A"
+ECHO !hashValue! >> .\%idDir%\%id%_info.txt
+set Hash=%Hash%!\n!%hashValue%
+ECHO MD5=%hashValue%
 ECHO SHA256: >> .\%idDir%\%id%_info.txt
-set tmp=CertUtil -hashfile .\%idDir%\%id%_sda.stepan SHA256 | find /i /v "sha256" | find /i /v "certutil"
-%tmp% >> .\%idDir%\%id%_info.txt
-set SHA256=%SHA256%!\n!%tmp%
-ECHO SHA256=%tmp%
+for /f "delims=" %%A in ('certutil -hashfile .\%idDir%\%id%_sda.stepan SHA256 ^| find /v ":"') do set "hashValue=%%A"
+ECHO !hashValue! >> .\%idDir%\%id%_info.txt
+set SHA256=%SHA256%!\n!%hashValue%
+ECHO SHA256=%hashValue%
 
 ECHO Hashwert erfolgreich berechnet
 GOTO END
@@ -228,9 +228,10 @@ GOTO END
 		ECHO.
 		goto END
 	)
-IF %askCompress% == y (set Dumps=%Dumps%!\n!Image=%id%_sda.e01) else set Dumps=%Dumps%!\n!Image=%id%_sda.stepan
+set Dumps=[Dumps]
+IF %askCompress% == y (set Dumps=!Dumps!!\n!Image=%id%_sda.e01) else set Dumps=!Dumps!!\n!Image=%id%_sda.stepan
 IF %askCompress% == y .\ressources\ftkimager\ftkimager.exe .\%idDir%\%id%_sda.stepan .\%idDir%\%id%_sda --e01 --compress 9
-SET ImageName=%id%_mmcblk0.sda
+SET ImageName=%id%_sda.stepan
 ECHO.
 ECHO Kopiere sonstige Partitionen
 .\ressources\adb.exe pull /dev/block/sdb .\%idDir%\%id%_sdb.stepan 2>NUL
@@ -238,60 +239,59 @@ ECHO Kopiere sonstige Partitionen
 		ECHO.
 		ECHO SDB nicht gefunden.
 		ECHO.
-		goto NANDXEND
+		goto SDAXEND
 	)
-IF %askCompress% == y (set Dumps=%Dumps%!\n!Image=%id%_sdb.e01) else set Dumps=%Dumps%!\n!Image=%id%_sdb.stepan
+IF %askCompress% == y (set Dumps=!Dumps!!\n!Image=%id%_sdb.e01) else set Dumps=!Dumps!!\n!Image=%id%_sdb.stepan
 IF %askCompress% == y .\ressources\ftkimager\ftkimager.exe .\%idDir%\%id%_sdb.stepan .\%idDir%\%id%_sdb --e01 --compress 9
 .\ressources\adb.exe pull /dev/block/sdc .\%idDir%\%id%_sdc.stepan 2>NUL
 	IF %ERRORLEVEL% NEQ 0 (
 		ECHO.
 		ECHO SDC nicht gefunden.
 		ECHO.
-		goto NANDXEND
+		goto SDAXEND
 	)
-IF %askCompress% == y (set Dumps=%Dumps%!\n!Image=%id%_sdc.e01) else set Dumps=%Dumps%!\n!Image=%id%_sdc.stepan
+IF %askCompress% == y (set Dumps=!Dumps!!\n!Image=%id%_sdc.e01) else set Dumps=!Dumps!!\n!Image=%id%_sdc.stepan
 IF %askCompress% == y .\ressources\ftkimager\ftkimager.exe .\%idDir%\%id%_sdc.stepan .\%idDir%\%id%_sdc --e01 --compress 9
 .\ressources\adb.exe pull /dev/block/sdd .\%idDir%\%id%_sdd.stepan 2>NUL
 	IF %ERRORLEVEL% NEQ 0 (
 		ECHO.
 		ECHO SDD nicht gefunden.
 		ECHO.
-		goto NANDXEND
+		goto SDAXEND
 	)
-IF %askCompress% == y (set Dumps=%Dumps%!\n!Image=%id%_sdd.e01) else set Dumps=%Dumps%!\n!Image=%id%_sdd.stepan
+IF %askCompress% == y (set Dumps=!Dumps!!\n!Image=%id%_sdd.e01) else set Dumps=!Dumps!!\n!Image=%id%_sdd.stepan
 IF %askCompress% == y .\ressources\ftkimager\ftkimager.exe .\%idDir%\%id%_sdd.stepan .\%idDir%\%id%_sdd --e01 --compress 9
 .\ressources\adb.exe pull /dev/block/sde .\%idDir%\%id%_sde.stepan 2>NUL
 	IF %ERRORLEVEL% NEQ 0 (
 		ECHO.
 		ECHO SDE nicht gefunden.
 		ECHO.
-		goto NANDXEND
+		goto SDAXEND
 	)
-IF %askCompress% == y (set Dumps=%Dumps%!\n!Image=%id%_sde.e01) else set Dumps=%Dumps%!\n!Image=%id%_sde.stepan
+IF %askCompress% == y (set Dumps=!Dumps!!\n!Image=%id%_sde.e01) else set Dumps=!Dumps!!\n!Image=%id%_sde.stepan
 IF %askCompress% == y .\ressources\ftkimager\ftkimager.exe .\%idDir%\%id%_sde.stepan .\%idDir%\%id%_sde --e01 --compress 9
 .\ressources\adb.exe pull /dev/block/sdf .\%idDir%\%id%_sdf.stepan 2>NUL
 	IF %ERRORLEVEL% NEQ 0 (
 		ECHO.
 		ECHO SDF nicht gefunden.
 		ECHO.
-		goto NANDXEND
+		goto SDAXEND
 	)
-IF %askCompress% == y (set Dumps=%Dumps%!\n!Image=%id%_sdf.e01) else set Dumps=%Dumps%!\n!Image=%id%_sdf.stepan
+IF %askCompress% == y (set Dumps=!Dumps!!\n!Image=%id%_sdf.e01) else set Dumps=!Dumps!!\n!Image=%id%_sdf.stepan
 IF %askCompress% == y .\ressources\ftkimager\ftkimager.exe .\%idDir%\%id%_sdf.stepan .\%idDir%\%id%_sdf --e01 --compress 9
 
-:NANDXEND
+:SDAXEND
 ECHO SDX erfolgreich
 ECHO.
 ECHO Interner Speicher erfolgreich kopiert
 set General=!General!!\n!EndTime=%date% %time%
 set ExtractionStatus=%ExtractionStatus%!\n!ExtractionStatus=Success
-
 IF %askHash% == y goto HashSDA
+goto END
 
 :NANDX
+set Dumps=[Dumps]
 .\ressources\adb.exe pull /dev/block/nanda .\%idDir%\%id%_nanda.stepan 2>NUL
-IF %askCompress% == y (set Dumps=%Dumps%!\n!Image=%id%_nanda.e01) else set Dumps=%Dumps%!\n!Image=%id%_nanda.stepan
-IF %askCompress% == y .\ressources\ftkimager\ftkimager.exe .\%idDir%\%id%_nanda.stepan .\%idDir%\%id%_nanda --e01 --compress 9	
 IF %ERRORLEVEL% NEQ 0 (
 	ECHO.
 	ECHO nandX nicht gefunden. 
@@ -300,6 +300,8 @@ IF %ERRORLEVEL% NEQ 0 (
 	goto SDA
 ) ELSE (
 	ECHO nanda gesichert.
+	IF %askCompress% == y (set Dumps=!Dumps!!\n!Image=%id%_nanda.e01) else set Dumps=!Dumps!!\n!Image=%id%_nanda.stepan
+	IF %askCompress% == y .\ressources\ftkimager\ftkimager.exe .\%idDir%\%id%_nanda.stepan .\%idDir%\%id%_nanda --e01 --compress 9	
 	.\ressources\adb.exe pull /dev/block/nandb .\%idDir%\%id%_nandb.stepan 2>NUL
 	IF %ERRORLEVEL% NEQ 0 (
 		ECHO.
@@ -307,7 +309,7 @@ IF %ERRORLEVEL% NEQ 0 (
 		ECHO.
 		goto NANDXENDE
 	)
-	IF %askCompress% == y (set Dumps=%Dumps%!\n!Image=%id%_nandb.e01) else set Dumps=%Dumps%!\n!Image=%id%_nandb.stepan
+	IF %askCompress% == y (set Dumps=!Dumps!!\n!Image=%id%_nandb.e01) else set Dumps=!Dumps!!\n!Image=%id%_nandb.stepan
 	IF %askCompress% == y .\ressources\ftkimager\ftkimager.exe .\%idDir%\%id%_nandb.stepan .\%idDir%\%id%_nandb --e01 --compress 9	
 	ECHO nandb gesichert.
 	.\ressources\adb.exe pull /dev/block/nandc .\%idDir%\%id%_nandc.stepan 2>NUL
@@ -317,7 +319,7 @@ IF %ERRORLEVEL% NEQ 0 (
 		ECHO.
 		goto NANDXENDE
 	)
-	IF %askCompress% == y (set Dumps=%Dumps%!\n!Image=%id%_nandc.e01) else set Dumps=%Dumps%!\n!Image=%id%_nandc.stepan
+	IF %askCompress% == y (set Dumps=!Dumps!!\n!Image=%id%_nandc.e01) else set Dumps=!Dumps!!\n!Image=%id%_nandc.stepan
 	IF %askCompress% == y .\ressources\ftkimager\ftkimager.exe .\%idDir%\%id%_nandc.stepan .\%idDir%\%id%_nandc --e01 --compress 9	
 	ECHO nandc gesichert.
 	.\ressources\adb.exe pull /dev/block/nandd .\%idDir%\%id%_nandd.stepan 2>NUL
@@ -327,7 +329,7 @@ IF %ERRORLEVEL% NEQ 0 (
 		ECHO.
 		goto NANDXENDE
 	)
-	IF %askCompress% == y (set Dumps=%Dumps%!\n!Image=%id%_nandd.e01) else set Dumps=%Dumps%!\n!Image=%id%_nandd.stepan
+	IF %askCompress% == y (set Dumps=!Dumps!!\n!Image=%id%_nandd.e01) else set Dumps=!Dumps!!\n!Image=%id%_nandd.stepan
 	IF %askCompress% == y .\ressources\ftkimager\ftkimager.exe .\%idDir%\%id%_nandd.stepan .\%idDir%\%id%_nandd --e01 --compress 9
 	ECHO nandd gesichert.
 	.\ressources\adb.exe pull /dev/block/nande .\%idDir%\%id%_nande.stepan 2>NUL
@@ -337,7 +339,7 @@ IF %ERRORLEVEL% NEQ 0 (
 		ECHO.
 		goto NANDXENDE
 	)
-	IF %askCompress% == y (set Dumps=%Dumps%!\n!Image=%id%_nande.e01) else set Dumps=%Dumps%!\n!Image=%id%_nande.stepan
+	IF %askCompress% == y (set Dumps=!Dumps!!\n!Image=%id%_nande.e01) else set Dumps=!Dumps!!\n!Image=%id%_nande.stepan
 	IF %askCompress% == y .\ressources\ftkimager\ftkimager.exe .\%idDir%\%id%_nande.stepan .\%idDir%\%id%_nande --e01 --compress 9
 	ECHO nande gesichert.
 	.\ressources\adb.exe pull /dev/block/nandf .\%idDir%\%id%_nandf.stepan 2>NUL
@@ -347,7 +349,7 @@ IF %ERRORLEVEL% NEQ 0 (
 		ECHO.
 		goto NANDXENDE
 	)
-	IF %askCompress% == y (set Dumps=%Dumps%!\n!Image=%id%_nandf.e01) else set Dumps=%Dumps%!\n!Image=%id%_nandf.stepan
+	IF %askCompress% == y (set Dumps=!Dumps!!\n!Image=%id%_nandf.e01) else set Dumps=!Dumps!!\n!Image=%id%_nandf.stepan
 	IF %askCompress% == y .\ressources\ftkimager\ftkimager.exe .\%idDir%\%id%_nandf.stepan .\%idDir%\%id%_nandf --e01 --compress 9
 	ECHO nandf gesichert.
 	.\ressources\adb.exe pull /dev/block/nandg .\%idDir%\%id%_nandg.stepan 2>NUL
@@ -357,7 +359,7 @@ IF %ERRORLEVEL% NEQ 0 (
 		ECHO.
 		goto NANDXENDE
 	)
-	IF %askCompress% == y (set Dumps=%Dumps%!\n!Image=%id%_nandg.e01) else set Dumps=%Dumps%!\n!Image=%id%_nandg.stepan
+	IF %askCompress% == y (set Dumps=!Dumps!!\n!Image=%id%_nandg.e01) else set Dumps=!Dumps!!\n!Image=%id%_nandg.stepan
 	IF %askCompress% == y .\ressources\ftkimager\ftkimager.exe .\%idDir%\%id%_nandg.stepan .\%idDir%\%id%_nandg --e01 --compress 9
 	ECHO nandg gesichert.
 	.\ressources\adb.exe pull /dev/block/nandh .\%idDir%\%id%_nandh.stepan 2>NUL
@@ -367,7 +369,7 @@ IF %ERRORLEVEL% NEQ 0 (
 		ECHO.
 		goto NANDXENDE
 	)
-	IF %askCompress% == y (set Dumps=%Dumps%!\n!Image=%id%_nandh.e01) else set Dumps=%Dumps%!\n!Image=%id%_nandh.stepan
+	IF %askCompress% == y (set Dumps=!Dumps!!\n!Image=%id%_nandh.e01) else set Dumps=!Dumps!!\n!Image=%id%_nandh.stepan
 	IF %askCompress% == y .\ressources\ftkimager\ftkimager.exe .\%idDir%\%id%_nandh.stepan .\%idDir%\%id%_nandh --e01 --compress 9
 	ECHO nandh gesichert.
 	.\ressources\adb.exe pull /dev/block/nandi .\%idDir%\%id%_nandi.stepan 2>NUL
@@ -377,7 +379,7 @@ IF %ERRORLEVEL% NEQ 0 (
 		ECHO.
 		goto NANDXENDE
 	)
-	IF %askCompress% == y (set Dumps=%Dumps%!\n!Image=%id%_nandi.e01) else set Dumps=%Dumps%!\n!Image=%id%_nandi.stepan
+	IF %askCompress% == y (set Dumps=!Dumps!!\n!Image=%id%_nandi.e01) else set Dumps=!Dumps!!\n!Image=%id%_nandi.stepan
 	IF %askCompress% == y .\ressources\ftkimager\ftkimager.exe .\%idDir%\%id%_nandi.stepan .\%idDir%\%id%_nandi --e01 --compress 9
 	ECHO nandi gesichert.
 	.\ressources\adb.exe pull /dev/block/nandj .\%idDir%\%id%_nandj.stepan 2>NUL
@@ -387,7 +389,7 @@ IF %ERRORLEVEL% NEQ 0 (
 		ECHO.
 		goto NANDXENDE
 	)
-	IF %askCompress% == y (set Dumps=%Dumps%!\n!Image=%id%_nandj.e01) else set Dumps=%Dumps%!\n!Image=%id%_nandj.stepan
+	IF %askCompress% == y (set Dumps=!Dumps!!\n!Image=%id%_nandj.e01) else set Dumps=!Dumps!!\n!Image=%id%_nandj.stepan
 	IF %askCompress% == y .\ressources\ftkimager\ftkimager.exe .\%idDir%\%id%_nandj.stepan .\%idDir%\%id%_nandj --e01 --compress 9
 	ECHO nandj gesichert.
 	.\ressources\adb.exe pull /dev/block/nandk .\%idDir%\%id%_nandk.stepan 2>NUL
@@ -397,7 +399,7 @@ IF %ERRORLEVEL% NEQ 0 (
 		ECHO.
 		goto NANDXENDE
 	)
-	IF %askCompress% == y (set Dumps=%Dumps%!\n!Image=\%id%_nandk.e01) else set Dumps=%Dumps%!\n!Image=%id%_nandk.stepan
+	IF %askCompress% == y (set Dumps=!Dumps!!\n!Image=\%id%_nandk.e01) else set Dumps=!Dumps!!\n!Image=%id%_nandk.stepan
 	IF %askCompress% == y .\ressources\ftkimager\ftkimager.exe .\%idDir%\%id%_nandk.stepan .\%idDir%\%id%_nandk --e01 --compress 9
 	ECHO nandk gesichert.
 	ECHO.
@@ -441,7 +443,7 @@ ECHO !Hash! >> .\%idDir%\%id%.ufd
 ::Lösche die Temp Datei
 DEL /f .\%idDir%\prop.csv
 DEL tmp2.txt
-IF %askCompress% == y (DEL /S *.stepan)
+IF %askCompress% == y (DEL /S .\%idDir%\*.stepan)
 
 ::Beende ADB Server
 .\ressources\adb.exe kill-server
