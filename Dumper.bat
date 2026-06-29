@@ -4,11 +4,11 @@ setlocal EnableDelayedExpansion
 (set \n=^
 %=empty line=%
 )
-ECHO ADB Dumper 0.0.1.3
+ECHO ADB Dumper 0.0.2
 ECHO Copyright, Copyleft and Copymiddle by Stepan
 ::Nächste Version auch Copyup und Copydown unterstützen
 
-echo [101;93m
+echo [106;97m
 :: Displays Ascii art
 type .\ressources\art
 echo [0m
@@ -45,7 +45,7 @@ del /f .\temp
 ECHO.
 
 ::Name eingeben
-ECHO [1;4mBitte Sicherungsname eingeben.[0m
+ECHO [1;4mBitte Sicherungsname eingeben[0m
 ECHO.
 set /P id=Sicherungsname:
 
@@ -158,6 +158,9 @@ ECHO Seriennummer: >> .\%idDir%\%id%_info.txt
 ECHO. >> .\%idDir%\%id%_info.txt
 ECHO Filesystem: >> .\%idDir%\%id%_info.txt
 .\ressources\adb.exe shell df >> .\%idDir%\%id%_info.txt
+
+ECHO [1;4mMetadaten erfasst[0m
+
 ECHO.
 ECHO.
 
@@ -167,7 +170,7 @@ ECHO [101;93mSichere Geraetespeicher[0m
 ECHO.
 
 ::Versuche die verschiedenen Speicher zu kopieren. Hier: mmcblk
-.\ressources\adb.exe pull /dev/block/mmcblk0 .\%idDir%\%id%_mmcblk0.stepan 2>NUL
+.\ressources\adb.exe pull /dev/block/mmcblk0 .\%idDir%\%id%_mmcblk0.stepan
 
 IF %ERRORLEVEL% NEQ 0 (
 	ECHO.
@@ -221,7 +224,7 @@ ECHO Hashwert erfolgreich berechnet
 GOTO END
 
 :SDA
-.\ressources\adb.exe pull /dev/block/sda .\%idDir%\%id%_sda.stepan 2>NUL
+.\ressources\adb.exe pull /dev/block/sda .\%idDir%\%id%_sda.stepan
 	IF %ERRORLEVEL% NEQ 0 (
 		ECHO.
 		ECHO interner Speicher nicht gefunden.
@@ -234,7 +237,7 @@ IF %askCompress% == y .\ressources\ftkimager\ftkimager.exe .\%idDir%\%id%_sda.st
 SET ImageName=%id%_sda.stepan
 ECHO.
 ECHO Kopiere sonstige Partitionen
-.\ressources\adb.exe pull /dev/block/sdb .\%idDir%\%id%_sdb.stepan 2>NUL
+.\ressources\adb.exe pull /dev/block/sdb .\%idDir%\%id%_sdb.stepan 
 	IF %ERRORLEVEL% NEQ 0 (
 		ECHO.
 		ECHO SDB nicht gefunden.
@@ -243,7 +246,7 @@ ECHO Kopiere sonstige Partitionen
 	)
 IF %askCompress% == y (set Dumps=!Dumps!!\n!Image=%id%_sdb.e01) else set Dumps=!Dumps!!\n!Image=%id%_sdb.stepan
 IF %askCompress% == y .\ressources\ftkimager\ftkimager.exe .\%idDir%\%id%_sdb.stepan .\%idDir%\%id%_sdb --e01 --compress 9
-.\ressources\adb.exe pull /dev/block/sdc .\%idDir%\%id%_sdc.stepan 2>NUL
+.\ressources\adb.exe pull /dev/block/sdc .\%idDir%\%id%_sdc.stepan 
 	IF %ERRORLEVEL% NEQ 0 (
 		ECHO.
 		ECHO SDC nicht gefunden.
@@ -252,7 +255,7 @@ IF %askCompress% == y .\ressources\ftkimager\ftkimager.exe .\%idDir%\%id%_sdb.st
 	)
 IF %askCompress% == y (set Dumps=!Dumps!!\n!Image=%id%_sdc.e01) else set Dumps=!Dumps!!\n!Image=%id%_sdc.stepan
 IF %askCompress% == y .\ressources\ftkimager\ftkimager.exe .\%idDir%\%id%_sdc.stepan .\%idDir%\%id%_sdc --e01 --compress 9
-.\ressources\adb.exe pull /dev/block/sdd .\%idDir%\%id%_sdd.stepan 2>NUL
+.\ressources\adb.exe pull /dev/block/sdd .\%idDir%\%id%_sdd.stepan 
 	IF %ERRORLEVEL% NEQ 0 (
 		ECHO.
 		ECHO SDD nicht gefunden.
@@ -261,7 +264,7 @@ IF %askCompress% == y .\ressources\ftkimager\ftkimager.exe .\%idDir%\%id%_sdc.st
 	)
 IF %askCompress% == y (set Dumps=!Dumps!!\n!Image=%id%_sdd.e01) else set Dumps=!Dumps!!\n!Image=%id%_sdd.stepan
 IF %askCompress% == y .\ressources\ftkimager\ftkimager.exe .\%idDir%\%id%_sdd.stepan .\%idDir%\%id%_sdd --e01 --compress 9
-.\ressources\adb.exe pull /dev/block/sde .\%idDir%\%id%_sde.stepan 2>NUL
+.\ressources\adb.exe pull /dev/block/sde .\%idDir%\%id%_sde.stepan 
 	IF %ERRORLEVEL% NEQ 0 (
 		ECHO.
 		ECHO SDE nicht gefunden.
@@ -270,7 +273,7 @@ IF %askCompress% == y .\ressources\ftkimager\ftkimager.exe .\%idDir%\%id%_sdd.st
 	)
 IF %askCompress% == y (set Dumps=!Dumps!!\n!Image=%id%_sde.e01) else set Dumps=!Dumps!!\n!Image=%id%_sde.stepan
 IF %askCompress% == y .\ressources\ftkimager\ftkimager.exe .\%idDir%\%id%_sde.stepan .\%idDir%\%id%_sde --e01 --compress 9
-.\ressources\adb.exe pull /dev/block/sdf .\%idDir%\%id%_sdf.stepan 2>NUL
+.\ressources\adb.exe pull /dev/block/sdf .\%idDir%\%id%_sdf.stepan 
 	IF %ERRORLEVEL% NEQ 0 (
 		ECHO.
 		ECHO SDF nicht gefunden.
@@ -291,7 +294,7 @@ goto END
 
 :NANDX
 set Dumps=[Dumps]
-.\ressources\adb.exe pull /dev/block/nanda .\%idDir%\%id%_nanda.stepan 2>NUL
+.\ressources\adb.exe pull /dev/block/nanda .\%idDir%\%id%_nanda.stepan 
 IF %ERRORLEVEL% NEQ 0 (
 	ECHO.
 	ECHO nandX nicht gefunden. 
@@ -302,7 +305,7 @@ IF %ERRORLEVEL% NEQ 0 (
 	ECHO nanda gesichert.
 	IF %askCompress% == y (set Dumps=!Dumps!!\n!Image=%id%_nanda.e01) else set Dumps=!Dumps!!\n!Image=%id%_nanda.stepan
 	IF %askCompress% == y .\ressources\ftkimager\ftkimager.exe .\%idDir%\%id%_nanda.stepan .\%idDir%\%id%_nanda --e01 --compress 9	
-	.\ressources\adb.exe pull /dev/block/nandb .\%idDir%\%id%_nandb.stepan 2>NUL
+	.\ressources\adb.exe pull /dev/block/nandb .\%idDir%\%id%_nandb.stepan
 	IF %ERRORLEVEL% NEQ 0 (
 		ECHO.
 		ECHO nandb nicht gefunden.
@@ -312,7 +315,7 @@ IF %ERRORLEVEL% NEQ 0 (
 	IF %askCompress% == y (set Dumps=!Dumps!!\n!Image=%id%_nandb.e01) else set Dumps=!Dumps!!\n!Image=%id%_nandb.stepan
 	IF %askCompress% == y .\ressources\ftkimager\ftkimager.exe .\%idDir%\%id%_nandb.stepan .\%idDir%\%id%_nandb --e01 --compress 9	
 	ECHO nandb gesichert.
-	.\ressources\adb.exe pull /dev/block/nandc .\%idDir%\%id%_nandc.stepan 2>NUL
+	.\ressources\adb.exe pull /dev/block/nandc .\%idDir%\%id%_nandc.stepan
 	IF %ERRORLEVEL% NEQ 0 (
 		ECHO.
 		ECHO nandc nicht gefunden.
@@ -322,7 +325,7 @@ IF %ERRORLEVEL% NEQ 0 (
 	IF %askCompress% == y (set Dumps=!Dumps!!\n!Image=%id%_nandc.e01) else set Dumps=!Dumps!!\n!Image=%id%_nandc.stepan
 	IF %askCompress% == y .\ressources\ftkimager\ftkimager.exe .\%idDir%\%id%_nandc.stepan .\%idDir%\%id%_nandc --e01 --compress 9	
 	ECHO nandc gesichert.
-	.\ressources\adb.exe pull /dev/block/nandd .\%idDir%\%id%_nandd.stepan 2>NUL
+	.\ressources\adb.exe pull /dev/block/nandd .\%idDir%\%id%_nandd.stepan
 	IF %ERRORLEVEL% NEQ 0 (
 		ECHO.
 		ECHO nandd nicht gefunden.
@@ -332,7 +335,7 @@ IF %ERRORLEVEL% NEQ 0 (
 	IF %askCompress% == y (set Dumps=!Dumps!!\n!Image=%id%_nandd.e01) else set Dumps=!Dumps!!\n!Image=%id%_nandd.stepan
 	IF %askCompress% == y .\ressources\ftkimager\ftkimager.exe .\%idDir%\%id%_nandd.stepan .\%idDir%\%id%_nandd --e01 --compress 9
 	ECHO nandd gesichert.
-	.\ressources\adb.exe pull /dev/block/nande .\%idDir%\%id%_nande.stepan 2>NUL
+	.\ressources\adb.exe pull /dev/block/nande .\%idDir%\%id%_nande.stepan
 	IF %ERRORLEVEL% NEQ 0 (
 		ECHO.
 		ECHO nande nicht gefunden.
@@ -342,7 +345,7 @@ IF %ERRORLEVEL% NEQ 0 (
 	IF %askCompress% == y (set Dumps=!Dumps!!\n!Image=%id%_nande.e01) else set Dumps=!Dumps!!\n!Image=%id%_nande.stepan
 	IF %askCompress% == y .\ressources\ftkimager\ftkimager.exe .\%idDir%\%id%_nande.stepan .\%idDir%\%id%_nande --e01 --compress 9
 	ECHO nande gesichert.
-	.\ressources\adb.exe pull /dev/block/nandf .\%idDir%\%id%_nandf.stepan 2>NUL
+	.\ressources\adb.exe pull /dev/block/nandf .\%idDir%\%id%_nandf.stepan
 		IF %ERRORLEVEL% NEQ 0 (
 		ECHO.
 		ECHO nandf nicht gefunden.
@@ -352,7 +355,7 @@ IF %ERRORLEVEL% NEQ 0 (
 	IF %askCompress% == y (set Dumps=!Dumps!!\n!Image=%id%_nandf.e01) else set Dumps=!Dumps!!\n!Image=%id%_nandf.stepan
 	IF %askCompress% == y .\ressources\ftkimager\ftkimager.exe .\%idDir%\%id%_nandf.stepan .\%idDir%\%id%_nandf --e01 --compress 9
 	ECHO nandf gesichert.
-	.\ressources\adb.exe pull /dev/block/nandg .\%idDir%\%id%_nandg.stepan 2>NUL
+	.\ressources\adb.exe pull /dev/block/nandg .\%idDir%\%id%_nandg.stepan
 		IF %ERRORLEVEL% NEQ 0 (
 		ECHO.
 		ECHO nandg nicht gefunden.
@@ -362,7 +365,7 @@ IF %ERRORLEVEL% NEQ 0 (
 	IF %askCompress% == y (set Dumps=!Dumps!!\n!Image=%id%_nandg.e01) else set Dumps=!Dumps!!\n!Image=%id%_nandg.stepan
 	IF %askCompress% == y .\ressources\ftkimager\ftkimager.exe .\%idDir%\%id%_nandg.stepan .\%idDir%\%id%_nandg --e01 --compress 9
 	ECHO nandg gesichert.
-	.\ressources\adb.exe pull /dev/block/nandh .\%idDir%\%id%_nandh.stepan 2>NUL
+	.\ressources\adb.exe pull /dev/block/nandh .\%idDir%\%id%_nandh.stepan
 		IF %ERRORLEVEL% NEQ 0 (
 		ECHO.
 		ECHO nandh nicht gefunden.
@@ -372,7 +375,7 @@ IF %ERRORLEVEL% NEQ 0 (
 	IF %askCompress% == y (set Dumps=!Dumps!!\n!Image=%id%_nandh.e01) else set Dumps=!Dumps!!\n!Image=%id%_nandh.stepan
 	IF %askCompress% == y .\ressources\ftkimager\ftkimager.exe .\%idDir%\%id%_nandh.stepan .\%idDir%\%id%_nandh --e01 --compress 9
 	ECHO nandh gesichert.
-	.\ressources\adb.exe pull /dev/block/nandi .\%idDir%\%id%_nandi.stepan 2>NUL
+	.\ressources\adb.exe pull /dev/block/nandi .\%idDir%\%id%_nandi.stepan
 		IF %ERRORLEVEL% NEQ 0 (
 		ECHO.
 		ECHO nandi nicht gefunden.
@@ -382,7 +385,7 @@ IF %ERRORLEVEL% NEQ 0 (
 	IF %askCompress% == y (set Dumps=!Dumps!!\n!Image=%id%_nandi.e01) else set Dumps=!Dumps!!\n!Image=%id%_nandi.stepan
 	IF %askCompress% == y .\ressources\ftkimager\ftkimager.exe .\%idDir%\%id%_nandi.stepan .\%idDir%\%id%_nandi --e01 --compress 9
 	ECHO nandi gesichert.
-	.\ressources\adb.exe pull /dev/block/nandj .\%idDir%\%id%_nandj.stepan 2>NUL
+	.\ressources\adb.exe pull /dev/block/nandj .\%idDir%\%id%_nandj.stepan
 		IF %ERRORLEVEL% NEQ 0 (
 		ECHO.
 		ECHO nandj nicht gefunden.
@@ -392,7 +395,7 @@ IF %ERRORLEVEL% NEQ 0 (
 	IF %askCompress% == y (set Dumps=!Dumps!!\n!Image=%id%_nandj.e01) else set Dumps=!Dumps!!\n!Image=%id%_nandj.stepan
 	IF %askCompress% == y .\ressources\ftkimager\ftkimager.exe .\%idDir%\%id%_nandj.stepan .\%idDir%\%id%_nandj --e01 --compress 9
 	ECHO nandj gesichert.
-	.\ressources\adb.exe pull /dev/block/nandk .\%idDir%\%id%_nandk.stepan 2>NUL
+	.\ressources\adb.exe pull /dev/block/nandk .\%idDir%\%id%_nandk.stepan
 		IF %ERRORLEVEL% NEQ 0 (
 		ECHO.
 		ECHO nandk nicht gefunden.
@@ -424,8 +427,9 @@ set General=!General!!\n!ExtractionType=Physical
 set General=!General!!\n!ExtractionMethod=ANDROID_ADB
 set General=!General!!\n!IsEncrypted=False
 set General=!General!!\n!IsEncryptedBySystem=False
-set General=!General!!\n!UfdVer=1.2
-set General=!General!!\n!ExtractionSoftwareVersion=5.3.6.7
+::set General=!General!!\n!UfdVer=1.2
+::set General=!General!!\n!ExtractionSoftwareVersion=5.3.6.7
+set General=!General!!\n!ExtractionSoftwareVersion=0.0.2
 set General=!General!!\n!IsPartialData=False
 
 ::Schreibt die Variablen in die ufd-Datei
